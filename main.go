@@ -1,10 +1,10 @@
 package main
 
 import (
-	"encoding/json"
+	"fmt"
 	"log"
+	"os"
 	"os/exec"
-	"slices"
 )
 
 func main() {
@@ -16,24 +16,32 @@ func main() {
 	if !flakesEnabled() {
 		log.Fatal("Flakes are not enabled")
 	}
+
+	stack:= getStack()
+
+	fmt.Println(stack)
 }
 
-type NixConfig struct {
-	ExperimentalFeatures ExperimentalFeatures `json:"experimental-features"`
-}
+type Stack string
+const (
+	GOLANG Stack = "GOLANG"
+	TERRAFORM Stack = "TERRAFORM"
+	UNKNOWN Stack = "UNKNOWN"
+)
 
-type ExperimentalFeatures struct {
-	Values []string `json:"value"`
-}
-
-func flakesEnabled() bool {
-	out, err := exec.Command("nix", "show-config", "--json").Output()
-	if err != nil {
-		log.Fatal("ERROR")
+func getStack() Stack {
+	if fileExists("go.mod") {
+		return GOLANG
 	}
+	if fileExists("main.tf") {
+		return TERRAFORM
+	}
+	return UNKNOWN
+}
 
-	config := &NixConfig{}
-	json.Unmarshal(out, config)
-
-	return slices.Contains(config.ExperimentalFeatures.Values, "flakes")
+func fileExists(fileName string) bool {
+	if _, err := os.Stat(fileName); err != nil && os.IsNotExist(err) {
+		return false
+	}
+	return true
 }
