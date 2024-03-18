@@ -1,20 +1,6 @@
-package stack
 
-type Golang struct{}
-
-func (g* Golang) Name() string {
-	return "golang"
-}
-
-func (g *Golang) Identify() bool {
-	// TODO: build this out
-	return fileExists("go.mod")
-}
-
-func (g *Golang) GetTemplate() string {
-	return `
 {
-  description = "Flake for {{ .ProjectName }}";
+  description = "Flake for nixi";
 
   inputs = {
     nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.0.tar.gz";
@@ -30,13 +16,13 @@ func (g *Golang) GetTemplate() string {
         pkgs = import nixpkgs { inherit system ; };
       in
       rec {
-        packages.{{ .ProjectName }} = pkgs.buildGoModule {
-          name = "{{ .ProjectName }}";
+        packages.nixi = pkgs.buildGoModule {
+          name = "nixi";
           src = gitignore.lib.gitignoreSource ./.;
           vendorHash = null;
         };
 
-        packages.default = packages.{{ .ProjectName }};
+        packages.default = packages.nixi;
 
         devShell = pkgs.mkShellNoCC {
           packages = with pkgs; [
@@ -47,6 +33,4 @@ func (g *Golang) GetTemplate() string {
         };
       }
     );
-}
-`
 }

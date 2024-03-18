@@ -28,7 +28,6 @@
           packages = with pkgs; [
             go_1_21 
             gotools
-            gopls
             golangci-lint
           ];
         };
