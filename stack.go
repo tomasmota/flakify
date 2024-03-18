@@ -19,9 +19,3 @@ func GetStack() Stack {
 	return UNKNOWN
 }
 
-func fileExists(fileName string) bool {
-	if _, err := os.Stat(fileName); err != nil && os.IsNotExist(err) {
-		return false
-	}
-	return true
-}
